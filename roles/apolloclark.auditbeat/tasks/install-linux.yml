@@ -1,0 +1,59 @@
+---
+- name: Download auditbeat.tar.gz 
+  get_url:
+    url: "https://repo/repository/devops/binary/auditbeat.tar.gz"
+    dest: "{{auditbeat_dest}}"
+    mode: '0660'
+
+- name: Unarchive auditbeat tar file
+  unarchive:
+    src: "{{archive_scr}}"
+    dest: "{{archive_dest}}"
+    remote_src: yes
+
+
+- name: delete the auditbeat.tar file in a remote server
+  file:
+   path: "{{archive_scr}}"
+   state: absent
+
+- name: Copy auditbeat.yml from templeate
+  template:
+    src: "{{auditbeat_config_scr}}"
+    dest: "{{auditbeat_config_dest}}"
+    owner: root
+    group: root
+   
+
+- name: Recursively change ownership auditbeat  directory
+  file:
+    path: "{{auditbeat_path}}"
+    state: directory
+    recurse: yes
+    owner: root
+    group: root
+
+- name: uploading service file
+  template:
+    src: "{{ service_src }}"
+    dest: "{{ service_dest }}"
+    owner: root
+    group: root
+    mode: 644 
+
+- name: Restart auditbeat
+  systemd:
+    name: "{{ auditbeat_service }}"
+    enabled: yes
+    #  daemon_reload: yes
+    state: restarted
+
+- name: create log file directory
+  file:
+    path: "{{log_path}}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0600
+    recurse: yes
+
