@@ -1,0 +1,8 @@
+- name: Install & configure auditbeat  on hosted machine
+  hosts: all
+  gather_facts: false
+  become: yes
+  roles:
+    - apolloclark.auditbeat
+
+    
